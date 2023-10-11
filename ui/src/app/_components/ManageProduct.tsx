@@ -9,10 +9,12 @@ import { Product } from "../_libs/interfaces";
 import Image from "next/image";
 import usePagination from "../_libs/usePagination";
 import {
+  IconAlertCircle,
   IconChevronLeft,
   IconChevronRight,
   IconEdit,
   IconTrash,
+  IconX,
 } from "@tabler/icons-react";
 
 export const ManageProduct = () => {
@@ -24,6 +26,7 @@ export const ManageProduct = () => {
   const [price, setPrice] = React.useState("");
   const [category, setCategory] = React.useState("");
   const [image, setImage] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(
     null
@@ -69,8 +72,8 @@ export const ManageProduct = () => {
     setSearch(e.target.value);
   };
 
-  const update = async () => {
-    await axios
+  const update = () => {
+    axios
       .put(
         API_URL + "/Product/" + selectedProduct?.id,
         {
@@ -102,6 +105,9 @@ export const ManageProduct = () => {
           return prev;
         });
         setOpenEdit(false);
+      })
+      .catch(() => {
+        setError("Đã có lỗi xảy ra, xin vui lòng thử lại sau 1 ít phút.");
       });
   };
 
@@ -123,20 +129,20 @@ export const ManageProduct = () => {
   return (
     <>
       <Dialog open={openDelete} onClose={() => setOpenDelete(false)}>
-        <Dialog.Panel className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md bg-white text-black p-5">
+        <Dialog.Panel className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md bg-slate-800 text-white p-5">
           <Dialog.Title as="h3" className="text-lg">
             Xóa sản phẩm
           </Dialog.Title>
 
           <p className="my-2">Bạn có chắc muốn xóa sản phẩm này không?</p>
 
-          <div className="flex gap-2 justify-end mt-2">
+          <div className="flex gap-2 justify-end mt-4">
             <Button
               defaultStyle={false}
               className="bg-rose-400 hover:bg-rose-500"
               onClick={deleteProduct}
             >
-              Xóa
+              Xác nhận
             </Button>
             <Button
               defaultStyle={false}
@@ -149,7 +155,7 @@ export const ManageProduct = () => {
         </Dialog.Panel>
       </Dialog>
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
-        <Dialog.Panel className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md bg-white text-black p-5">
+        <Dialog.Panel className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md bg-slate-900 text-white p-5">
           <Dialog.Title as="h3" className="text-lg font-bold">
             Chỉnh sửa
           </Dialog.Title>
@@ -157,18 +163,20 @@ export const ManageProduct = () => {
           <div className="mt-2 gap-6 grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 place-items-center lg:min-w-[60rem] w-full z-1">
             <Input
               defaultValue={selectedProduct?.productName}
-              className="text-black"
               label="Tên sản phẩm"
               onChange={handleName}
             />
 
             <Input
               defaultValue={selectedProduct?.price}
-              className="text-black"
               label="Giá sản phẩm"
               type="number"
               onKeyDown={(event) => {
-                if (!/[0-9]/.test(event.key)) {
+                if (
+                  !/[0-9]/.test(event.key) &&
+                  event.key !== "Backspace" &&
+                  event.key !== "Tab"
+                ) {
                   event.preventDefault();
                 }
               }}
@@ -177,38 +185,54 @@ export const ManageProduct = () => {
 
             <Input
               defaultValue={selectedProduct?.category}
-              className="text-black"
               onChange={handleCategory}
               label="Danh mục sản phẩm"
             />
 
             <Input
               defaultValue={selectedProduct?.image}
-              className="text-black"
               onChange={handleImage}
               label="Ảnh sản phẩm"
             />
 
             <Input
               defaultValue={selectedProduct?.description}
-              className="text-black"
               onChange={handleDesc}
               label="Mô tả sản phẩm"
               textarea
             />
           </div>
 
+          {error && (
+            <div className="bg-red-500 max-w-md mx-auto p-5 my-5">
+              <div className="flex items-center justify-between">
+                <div className="flex gap-2 mb-2 items-center">
+                  <IconAlertCircle />
+                  <h4 className="text-lg">Lỗi</h4>
+                </div>
+
+                <button
+                  onClick={() => setError("")}
+                  className="cursor-pointer rounded-full p-2 focus:outline-none text-black"
+                >
+                  <IconX size={25} />
+                </button>
+              </div>
+              <p>{error}</p>
+            </div>
+          )}
+
           <div className="flex justify-end mt-2 gap-2">
             <Button
               onClick={update}
               defaultStyle={false}
-              className="bg-purple-400 hover:bg-purple-500"
+              className="bg-purple-400 hover:bg-purple-500 text-black"
             >
               Cập nhật
             </Button>
             <Button
               defaultStyle={false}
-              className="bg-rose-400 hover:bg-rose-500"
+              className="bg-rose-400 hover:bg-rose-500 text-black"
               onClick={() => setOpenEdit(false)}
             >
               Đóng

@@ -3,10 +3,21 @@ import React from "react";
 import { Product } from "../_libs/interfaces";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
+import axios from "axios";
+import { API_URL } from "../_libs/constant";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export const ChartData = ({ products }: { products: Product[] }) => {
+export const ChartData = () => {
+  const [products, setProducts] = React.useState<Product[]>([]);
+
+  React.useEffect(() => {
+    axios
+      .get(API_URL + "/Product")
+      .then((res) => res.data)
+      .then(setProducts);
+  }, []);
+
   const data = {
     labels: ["Điện thoại", "Laptop", "Máy tính bảng"],
     datasets: [

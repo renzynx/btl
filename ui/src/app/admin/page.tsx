@@ -5,23 +5,12 @@ import { useUserContext } from "../_context/user";
 import Error from "next/error";
 import { Tab } from "@headlessui/react";
 import Button from "../_components/Button";
-import axios from "axios";
-import { API_URL } from "../_libs/constant";
-import { Product } from "../_libs/interfaces";
 import { ManageProduct } from "../_components/ManageProduct";
 import { ChartData } from "../_components/ChartData";
 import { NewProductForm } from "../_components/NewProductForm";
 
 const Admin = () => {
   const { user } = useUserContext();
-  const [products, setProducts] = React.useState<Product[]>([]);
-
-  React.useEffect(() => {
-    axios
-      .get(API_URL + "/Product")
-      .then((res) => res.data)
-      .then(setProducts);
-  }, []);
 
   return user?.role === 1 ? (
     <div className="flex flex-col items-center justify-center mt-5">
@@ -37,14 +26,14 @@ const Admin = () => {
             <Button>Tạo sản phẩm</Button>
           </Tab>
         </Tab.List>
-        <Tab.Panels className="my-10">
+        <Tab.Panels className="my-10 focus:outline-none">
           <Tab.Panel>
-            <ChartData products={products} />
+            <ChartData />
           </Tab.Panel>
-          <Tab.Panel>
+          <Tab.Panel className="focus:outline-none">
             <ManageProduct />
           </Tab.Panel>
-          <Tab.Panel>
+          <Tab.Panel className="focus:outline-none">
             <NewProductForm />
           </Tab.Panel>
         </Tab.Panels>

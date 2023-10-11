@@ -11,7 +11,6 @@ import Input from "@/app/_components/Input";
 const Register = () => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [confirmPassword, setConfirmPassword] = React.useState("");
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -19,12 +18,6 @@ const Register = () => {
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
-  };
-
-  const handleConfirmPasswordChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setConfirmPassword(e.target.value);
   };
 
   const register = async () => {
@@ -55,13 +48,6 @@ const Register = () => {
           onChange={handlePasswordChange}
           label="Mật khẩu"
           id="password"
-          type="password"
-        />
-
-        <Input
-          onChange={handleConfirmPasswordChange}
-          label="Nhập lại mật khẩu"
-          id="passwordConfirm"
           type="password"
         />
 

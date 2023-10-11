@@ -5,6 +5,7 @@ import Button from "./Button";
 import Input from "./Input";
 import axios from "axios";
 import { API_URL } from "../_libs/constant";
+import { IconAlertCircle, IconX } from "@tabler/icons-react";
 
 export const NewProductForm = () => {
   const [pName, setPName] = React.useState("");
@@ -13,6 +14,7 @@ export const NewProductForm = () => {
   const [image, setImage] = React.useState("");
   const [desc, setDesc] = React.useState("");
   const [success, setSuccess] = React.useState(false);
+  const [error, setError] = React.useState("");
 
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPName(e.target.value);
@@ -31,25 +33,34 @@ export const NewProductForm = () => {
   };
 
   const submit = async () => {
-    const response = await axios.post(
-      API_URL + "/Product",
-      {
-        productName: pName,
-        price,
-        category,
-        image,
-        description: desc,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+    try {
+      if (!pName || !price || !category || !image || !desc) {
+        setError("Tất cả các ô cần phải được điền!");
+        return;
       }
-    );
 
-    if (response.data) {
-      setSuccess(true);
-    } else {
+      const response = await axios.post(
+        API_URL + "/Product",
+        {
+          productName: pName,
+          price,
+          category,
+          image,
+          description: desc,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (response.data) {
+        setSuccess(true);
+      } else {
+      }
+    } catch (error) {
+      setError("Đã có lỗi xảy ra, xin vui lòng thử lại sau 1 ít phút.");
     }
   };
 
@@ -59,14 +70,18 @@ export const NewProductForm = () => {
 
   return (
     <>
-      <div className="gap-6 grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 place-items-center lg:min-w-[60rem] w-full z-1">
+      <div className="ring-1 rounded-md p-5 gap-6 grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 place-items-center lg:min-w-[60rem] w-full z-1">
         <Input label="Tên sản phẩm" onChange={handleName} />
 
         <Input
           label="Giá sản phẩm"
           type="number"
           onKeyDown={(event) => {
-            if (!/[0-9]/.test(event.key) && event.key !== "Backspace") {
+            if (
+              !/[0-9]/.test(event.key) &&
+              event.key !== "Backspace" &&
+              event.key !== "Tab"
+            ) {
               event.preventDefault();
             }
           }}
@@ -78,9 +93,36 @@ export const NewProductForm = () => {
         <Input onChange={handleImage} label="Ảnh sản phẩm" />
 
         <Input onChange={handleDesc} label="Mô tả sản phẩm" textarea />
-
-        <Button onClick={submit}>Tạo sản phẩm</Button>
       </div>
+
+      <div className="flex justify-center mt-5 p-5">
+        <Button
+          defaultStyle={false}
+          className="bg-orange-400 hover:bg-orange-500 text-black px-7 py-2"
+          onClick={submit}
+        >
+          Thêm mới
+        </Button>
+      </div>
+
+      {error && (
+        <div className="bg-red-500 max-w-md mx-auto p-5 my-5">
+          <div className="flex items-center justify-between">
+            <div className="flex gap-2 mb-2 items-center">
+              <IconAlertCircle />
+              <h4 className="text-lg">Lỗi</h4>
+            </div>
+
+            <button
+              onClick={() => setError("")}
+              className="cursor-pointer rounded-full p-2 focus:outline-none text-black"
+            >
+              <IconX size={25} />
+            </button>
+          </div>
+          <p>{error}</p>
+        </div>
+      )}
 
       <Dialog
         as="div"
